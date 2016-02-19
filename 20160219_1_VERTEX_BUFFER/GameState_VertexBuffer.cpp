@@ -109,11 +109,34 @@ void GameState_VertexBuffer::Initialize()
 	memcpy_s(pI, 36 * sizeof(DWORD), index, 36 * sizeof(DWORD));
 	indexBuffer->Unlock();
 
+	D3DXFONT_DESC font_desc;
+	ZeroMemory(&font_desc, sizeof(D3DXFONT_DESC));
+	font_desc.Height = 50;
+	font_desc.Width = 25;
+	font_desc.Weight = FW_NORMAL;
+	font_desc.MipLevels = D3DX_DEFAULT;
+	font_desc.Italic = false;
+	font_desc.CharSet = DEFAULT_CHARSET;
+	font_desc.OutputPrecision = OUT_DEFAULT_PRECIS;
+	font_desc.Quality = DEFAULT_QUALITY;
+	font_desc.PitchAndFamily = FF_DONTCARE;
+	wcscpy_s(font_desc.FaceName, L"휴먼편지체");	//글꼴 스타일
+	//AddFontResource(L"./Data/Font/umberto.ttf");
+	//wcscpy_s(font_desc.FaceName, L"umberto");
+
+	D3DXCreateFontIndirect(
+		GameManager::GetDevice(),
+		&font_desc,
+		&font);
+
+	printf_s("Current Render Mode: %d\n", currentRenderMode);
+
 	Reset();
 }
 
 void GameState_VertexBuffer::Destroy()
 {
+	SAFE_RELEASE(font);
 	SAFE_RELEASE(indexBuffer);
 	SAFE_RELEASE(vertexBuffer);
 
@@ -141,13 +164,20 @@ void GameState_VertexBuffer::Update()
 {
 	if ((GetAsyncKeyState(VK_SPACE) & 0x8000) != 0)
 	{
-		bool wasPressed = KeyState[FORWARD];
+		bool wasPressed = keyState[UP];
 		if (wasPressed == false)
 		{
-			//처음 눌렀다.
-			AnimationOnOff(true);
+			int modeCount = static_cast<int>(currentRenderMode);
+			modeCount++;
+			currentRenderMode = static_cast<RenderMode>(modeCount % NUM_OF_RENDER_MODE);
+			printf_s("Current Render Mode: %d\n", currentRenderMode);
 		}
-		keyState[FORWARD] = true;
+		keyState[UP] = true;
+	}
+
+	else
+	{
+		keyState[UP] = false;
 	}
 }
 
@@ -157,32 +187,72 @@ void GameState_VertexBuffer::Render()
 	{
 		grid->Render();
 	}
-	if (cube)
+
+	/*if (cube)
 	{
 		cube->Render();
-	}
-	if (cubeArray)
+	}*/
+
+	GameManager::GetDevice()->SetStreamSource(
+		0, vertexBuffer, 0, sizeof(FVF_PositionNormal));
+	GameManager::GetDevice()->SetIndices(indexBuffer);
+	int count = CUBE_COUNT_SQRT*CUBE_COUNT_SQRT;
+
+	if (cubeArray && (currentRenderMode == NORMAL))
 	{
-		//for (int i = 0; i < CUBE_COUNT_SQRT; ++i)
-		//{
-		//	for (int j = 0; j < CUBE_COUNT_SQRT; ++j)
-		//	{
-		//		cubeArray[i*CUBE_COUNT_SQRT + j].Render();
-		//	}
-		//}
-
-
-		GameManager::GetDevice()->SetStreamSource(
-			0, vertexBuffer, 0, sizeof(FVF_PositionNormal));
-		GameManager::GetDevice()->SetIndices(indexBuffer);
-
-		int count = CUBE_COUNT_SQRT*CUBE_COUNT_SQRT;
 		for (int i = 0; i < count; ++i)
 		{
-			//cubeArray[i].Render();
-			//cubeArray[i].RenderVB();
+			cubeArray[i].Render();
+		}
+	}
+
+	if (cubeArray && (currentRenderMode == VB))
+	{
+		for (int i = 0; i < count; ++i)
+		{
+			cubeArray[i].RenderVB();
+		}
+	}
+
+	if (cubeArray && (currentRenderMode == VB_SHARED))
+	{
+		for (int i = 0; i < count; ++i)
+		{
 			cubeArray[i].RenderShared();
 		}
+	}
+
+	if (font)
+	{
+		RECT rc = { 450, 10, 11, 11 };
+		char buff[256] = "\0";
+
+		switch (currentRenderMode)
+		{
+		case NORMAL:
+			sprintf_s(buff, "Render Mode : Normal");
+			break;
+
+		case VB:
+			sprintf_s(buff, "Render Mode : Vertex Buffer");
+			break;
+
+		case VB_SHARED:
+			sprintf_s(buff, "Render Mode : Vertex Buffer Shared");
+			break;
+
+		default:
+			break;
+		}
+
+		font->DrawTextA(
+			NULL,
+			LPCSTR(buff),
+			strlen(buff),
+			&rc,
+			DT_TOP | DT_LEFT | DT_NOCLIP,
+			D3DCOLOR_XRGB(255, 255, 255)
+			);
 	}
 }
 

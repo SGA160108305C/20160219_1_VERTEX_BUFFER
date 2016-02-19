@@ -27,10 +27,20 @@ protected:
 	{
 		NORMAL,
 		VB,
-		VB_SHARED
+		VB_SHARED,
+		NUM_OF_RENDER_MODE
 	};
 
 	RenderMode currentRenderMode = NORMAL;
+
+	enum KeyState
+	{
+		UP,
+		DOWN,
+		NUM_OF_KEY_TYPE
+	};
+
+	bool keyState[NUM_OF_KEY_TYPE];
 
 	Grid* grid = nullptr;
 	Cube_VertexBuffer* cube = nullptr;
@@ -40,5 +50,7 @@ protected:
 
 	LPDIRECT3DVERTEXBUFFER9 vertexBuffer = nullptr;
 	LPDIRECT3DINDEXBUFFER9 indexBuffer = nullptr;
+
+	LPD3DXFONT font = nullptr;
 };
 
