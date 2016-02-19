@@ -12,6 +12,9 @@ GameManager::~GameManager()
 
 void GameManager::Initialize(HWND handle)
 {
+	if (hasInitialized) return;//should be initialized only once.
+	hasInitialized = true;
+
 	windowHandle = handle;
 
 	direct3d = Direct3DCreate9(D3D_SDK_VERSION);
@@ -58,6 +61,26 @@ void GameManager::Initialize(HWND handle)
 		return;
 	}
 
+	D3DXFONT_DESC font_desc;
+	ZeroMemory(&font_desc, sizeof(D3DXFONT_DESC));
+	font_desc.Height = 50;
+	font_desc.Width = 25;
+	font_desc.Weight = FW_NORMAL;
+	font_desc.MipLevels = D3DX_DEFAULT;
+	font_desc.Italic = false;
+	font_desc.CharSet = DEFAULT_CHARSET;
+	font_desc.OutputPrecision = OUT_DEFAULT_PRECIS;
+	font_desc.Quality = DEFAULT_QUALITY;
+	font_desc.PitchAndFamily = FF_DONTCARE;
+	wcscpy_s(font_desc.FaceName, L"휴먼편지체");	//글꼴 스타일
+	//AddFontResource(L"./Data/Font/umberto.ttf");
+	//wcscpy_s(font_desc.FaceName, L"umberto");
+
+	D3DXCreateFontIndirect(
+		GameManager::GetDevice(),
+		&font_desc,
+		&font);
+
 	//조명 초기화 및 세팅
 	ZeroMemory(&mainLight, sizeof(D3DLIGHT9));
 	mainLight.Type = D3DLIGHTTYPE::D3DLIGHT_DIRECTIONAL;
@@ -90,6 +113,8 @@ void GameManager::Destroy()
 	//카메라 제거
 	SAFE_DELETE(camera);
 
+	SAFE_RELEASE(font);
+
 	//GameState들 정리
 	GameStateManager::Get().Destroy();		
 	
@@ -109,6 +134,16 @@ void GameManager::Destroy()
 void GameManager::Loop(double tick)
 {
 	currentTickTime = tick;
+
+	FPSTimeElapsed += currentTickTime;
+	FPSFrameCount++;
+
+	if (FPSTimeElapsed > 1.0f)
+	{
+		frameRate = FPSFrameCount;
+		FPSFrameCount = 0;
+		FPSTimeElapsed = 0.0f;
+	}
 
 	Update();
 	Render();
@@ -142,6 +177,20 @@ void GameManager::Render()
 	direct3dDevice->BeginScene();
 
 	// 그림 그리기 -------------------------------------------------
+
+	if (font)
+	{
+		RECT rc = { 10, 10, 11, 11 };
+		char buff[256] = "\0";
+		sprintf_s(buff, "FPS : %d", frameRate);
+		font->DrawTextA(
+			NULL,
+			LPCSTR(buff),
+			strlen(buff),
+			&rc,
+			DT_TOP | DT_LEFT | DT_NOCLIP,
+			D3DCOLOR_XRGB(255, 255, 255));
+	}
 
 	//GameState 그리기
 	GameStateManager::Get().Render();

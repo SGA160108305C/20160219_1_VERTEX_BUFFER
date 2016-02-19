@@ -92,6 +92,7 @@
     <ClCompile Include="CubeMan_Walk.cpp" />
     <ClCompile Include="Cube_Material.cpp" />
     <ClCompile Include="Cube_Texture.cpp" />
+    <ClCompile Include="Cube_VertexBuffer.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="GameState_DX_Base.cpp" />
@@ -101,6 +102,7 @@
     <ClCompile Include="GameState_OBJ_Load.cpp" />
     <ClCompile Include="GameState_Picking.cpp" />
     <ClCompile Include="GameState_Texture.cpp" />
+    <ClCompile Include="GameState_VertexBuffer.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Obj.cpp" />
@@ -120,6 +122,7 @@
     <ClInclude Include="CubeMan_Walk.h" />
     <ClInclude Include="Cube_Material.h" />
     <ClInclude Include="Cube_Texture.h" />
+    <ClInclude Include="Cube_VertexBuffer.h" />
     <ClInclude Include="FVF.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameObject.h" />
@@ -132,6 +135,7 @@
     <ClInclude Include="GameState_OBJ_Load.h" />
     <ClInclude Include="GameState_Picking.h" />
     <ClInclude Include="GameState_Texture.h" />
+    <ClInclude Include="GameState_VertexBuffer.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="MaterialTexture.h" />
     <ClInclude Include="MemoryLeakCheck.h" />

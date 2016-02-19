@@ -7,6 +7,7 @@
 #include "GameState_Light.h"
 #include "GameState_OBJ_Load.h"
 #include "GameState_Picking.h"
+#include "GameState_VertexBuffer.h"
 
 
 enum GameStateType
