@@ -23,6 +23,15 @@ public:
 	virtual LRESULT InputProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) override;
 
 protected:
+	enum RenderMode
+	{
+		NORMAL,
+		VB,
+		VB_SHARED
+	};
+
+	RenderMode currentRenderMode = NORMAL;
+
 	Grid* grid = nullptr;
 	Cube_VertexBuffer* cube = nullptr;
 

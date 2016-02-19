@@ -116,6 +116,19 @@ void GameState_VertexBuffer::Destroy()
 {
 	SAFE_RELEASE(indexBuffer);
 	SAFE_RELEASE(vertexBuffer);
+
+	if (cubeArray)
+	{
+		int count = CUBE_COUNT_SQRT*CUBE_COUNT_SQRT;
+		for (int i = 0; i < count; ++i)
+		{
+			cubeArray[i].Destroy();
+		}
+		delete[] cubeArray;
+		cubeArray = nullptr;
+	}
+
+
 	SAFE_DELETE(cube);
 	SAFE_DELETE(grid);
 }
@@ -126,7 +139,16 @@ void GameState_VertexBuffer::Reset()
 
 void GameState_VertexBuffer::Update()
 {
-
+	if ((GetAsyncKeyState(VK_SPACE) & 0x8000) != 0)
+	{
+		bool wasPressed = KeyState[FORWARD];
+		if (wasPressed == false)
+		{
+			//Ã³À½ ´­·¶´Ù.
+			AnimationOnOff(true);
+		}
+		keyState[FORWARD] = true;
+	}
 }
 
 void GameState_VertexBuffer::Render()
@@ -135,14 +157,25 @@ void GameState_VertexBuffer::Render()
 	{
 		grid->Render();
 	}
-
 	if (cube)
 	{
 		cube->Render();
 	}
-
 	if (cubeArray)
 	{
+		//for (int i = 0; i < CUBE_COUNT_SQRT; ++i)
+		//{
+		//	for (int j = 0; j < CUBE_COUNT_SQRT; ++j)
+		//	{
+		//		cubeArray[i*CUBE_COUNT_SQRT + j].Render();
+		//	}
+		//}
+
+
+		GameManager::GetDevice()->SetStreamSource(
+			0, vertexBuffer, 0, sizeof(FVF_PositionNormal));
+		GameManager::GetDevice()->SetIndices(indexBuffer);
+
 		int count = CUBE_COUNT_SQRT*CUBE_COUNT_SQRT;
 		for (int i = 0; i < count; ++i)
 		{
